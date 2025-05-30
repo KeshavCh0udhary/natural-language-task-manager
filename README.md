@@ -106,3 +106,20 @@ natural-language-task-manager/
 - supabase-py
 - python-dateutil
 - python-dotenv
+
+## Screenshots
+
+### Single Task Input Interface
+![Single Task Input](https://xozgjogiiexwstpvlwem.supabase.co/storage/v1/object/public/screenshots//Screenshot%20(59).png)
+![Task Board View](https://xozgjogiiexwstpvlwem.supabase.co/storage/v1/object/public/screenshots//Screenshot%20(60).png)
+
+### Transcript Input Interface
+![Transcript Input](https://xozgjogiiexwstpvlwem.supabase.co/storage/v1/object/public/screenshots//Screenshot%20(61).png)
+![Multiple Tasks View](https://xozgjogiiexwstpvlwem.supabase.co/storage/v1/object/public/screenshots//Screenshot%20(62).png)
+
+The screenshots demonstrate:
+- Single task input with natural language processing
+- Transcript input for bulk task creation
+- Priority-based task organization
+- Clean and modern task board interface
+- Task cards with assignee and due date information
