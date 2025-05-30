@@ -41,7 +41,7 @@ OPENAI_API_KEY = "your-openai-api-key"
 
 Replace the placeholders with your actual database credentials and OpenAI API key.
 
-### 5. Run the Application
+### 4. Run the Application
 
 ```bash
 streamlit run app.py
