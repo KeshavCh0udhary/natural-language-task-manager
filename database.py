@@ -1,143 +1,79 @@
-import psycopg2
 import streamlit as st
 from datetime import datetime
+from supabase import create_client, Client
 
-def get_database_connection():
-    """Get a connection to the database using the configured URL."""
-    return psycopg2.connect("postgresql://postgres:%40Password9%23@db.wcvfghkffyktywzemkhp.supabase.co:5432/postgres")
+# Initialize Supabase client
+supabase: Client = create_client(
+    "https://wcvfghkffyktywzemkhp.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndjdmZnaGtmZnlrdHl3emVta2hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MTAwMzcsImV4cCI6MjA2NDA4NjAzN30.Y5W3tF5lOx0X_VHa_EDFvY1bpaygsH3XOcHK3_w5DYg"
+)
 
 def init_database():
     """Initialize the database by creating the tasks table if it doesn't exist."""
-    conn = get_database_connection()
-    cur = conn.cursor()
-    
     try:
         # Create tasks table if it doesn't exist
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS tasks (
-                id SERIAL PRIMARY KEY,
-                title TEXT NOT NULL,
-                assignee TEXT NOT NULL,
-                due_date TIMESTAMP NOT NULL,
-                priority TEXT NOT NULL DEFAULT 'P3',
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        """)
-        conn.commit()
-        
+        supabase.table('tasks').select('*').limit(1).execute()
     except Exception as e:
-        conn.rollback()
         st.error(f"Error initializing database: {str(e)}")
-    finally:
-        cur.close()
-        conn.close()
 
 def add_task(task_name, assignee, due_date, priority='P3'):
     """Add a new task to the database."""
-    conn = get_database_connection()
-    cur = conn.cursor()
-    
     try:
         # Check for duplicate task
-        cur.execute("""
-            SELECT id FROM tasks 
-            WHERE title = %s 
-            AND assignee = %s 
-            AND due_date = %s 
-            AND priority = %s
-        """, (task_name, assignee, due_date, priority))
+        response = supabase.table('tasks').select('id').eq('title', task_name).eq('assignee', assignee).eq('due_date', due_date.isoformat()).eq('priority', priority).execute()
         
-        if cur.fetchone():
+        if response.data:
             st.warning(f"Task already exists: {task_name}")
             return False
             
         # Insert new task
-        cur.execute("""
-            INSERT INTO tasks (title, assignee, due_date, priority)
-            VALUES (%s, %s, %s, %s)
-            RETURNING id
-        """, (task_name, assignee, due_date, priority))
+        response = supabase.table('tasks').insert({
+            'title': task_name,
+            'assignee': assignee,
+            'due_date': due_date.isoformat(),
+            'priority': priority
+        }).execute()
         
-        task_id = cur.fetchone()[0]
-        conn.commit()
-        return task_id
+        return response.data[0]['id']
         
     except Exception as e:
-        conn.rollback()
         raise e
-    finally:
-        cur.close()
-        conn.close()
 
 def get_all_tasks():
     """Get all tasks ordered by due date."""
-    conn = get_database_connection()
-    cur = conn.cursor()
-    
     try:
-        cur.execute("""
-            SELECT 
-                id,
-                title as task_name,
-                assignee,
-                due_date,
-                priority
-            FROM tasks
-            ORDER BY due_date ASC
-        """)
+        response = supabase.table('tasks').select('*').order('due_date').execute()
         
         tasks = []
-        for row in cur.fetchall():
+        for row in response.data:
             tasks.append({
-                'id': row[0],
-                'task_name': row[1],
-                'assignee': row[2],
-                'due_date': row[3],
-                'priority': row[4]
+                'id': row['id'],
+                'task_name': row['title'],
+                'assignee': row['assignee'],
+                'due_date': datetime.fromisoformat(row['due_date']),
+                'priority': row['priority']
             })
         
         return tasks
     except Exception as e:
         st.error(f"Database error: {str(e)}")
         return []
-    finally:
-        cur.close()
-        conn.close()
 
 def update_task(task_id, task_name, assignee, due_date, priority):
     """Update an existing task."""
-    conn = get_database_connection()
-    cur = conn.cursor()
-    
     try:
-        cur.execute("""
-            UPDATE tasks
-            SET title = %s,
-                assignee = %s,
-                due_date = %s,
-                priority = %s
-            WHERE id = %s
-        """, (task_name, assignee, due_date, priority, task_id))
-        
-        conn.commit()
+        supabase.table('tasks').update({
+            'title': task_name,
+            'assignee': assignee,
+            'due_date': due_date.isoformat(),
+            'priority': priority
+        }).eq('id', task_id).execute()
     except Exception as e:
-        conn.rollback()
         raise e
-    finally:
-        cur.close()
-        conn.close()
 
 def delete_task(task_id):
     """Delete a task by its ID."""
-    conn = get_database_connection()
-    cur = conn.cursor()
-    
     try:
-        cur.execute("DELETE FROM tasks WHERE id = %s", (task_id,))
-        conn.commit()
+        supabase.table('tasks').delete().eq('id', task_id).execute()
     except Exception as e:
-        conn.rollback()
-        raise e
-    finally:
-        cur.close()
-        conn.close() 
+        raise e 

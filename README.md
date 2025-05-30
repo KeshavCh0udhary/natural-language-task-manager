@@ -9,7 +9,7 @@ A modern task management application that understands natural language input, bu
 - 📊 Priority-based task organization (P1-P4)
 - 🗂️ Clean and intuitive task board interface
 - ⚡ Real-time updates and editing
-- 🔄 Persistent storage with PostgreSQL
+- 🔄 Persistent storage with Supabase
 
 ## Setup Instructions
 
@@ -39,7 +39,7 @@ Create a `.streamlit/secrets.toml` file in your project directory:
 OPENAI_API_KEY = "your-openai-api-key"
 ```
 
-Replace the placeholders with your actual database credentials and OpenAI API key.
+Replace the placeholder with your OpenAI API key.
 
 ### 4. Run the Application
 
@@ -71,7 +71,7 @@ The application will be available at `http://localhost:8501`
 ```
 natural-language-task-manager/
 ├── app.py              # Main Streamlit application
-├── database.py         # Database operations
+├── database.py         # Database operations using Supabase
 ├── task_parser.py      # Natural language parsing
 ├── requirements.txt    # Project dependencies
 └── .streamlit/
@@ -82,6 +82,6 @@ natural-language-task-manager/
 
 - streamlit
 - openai
-- psycopg2-binary
+- supabase-py
 - python-dateutil
 - python-dotenv
