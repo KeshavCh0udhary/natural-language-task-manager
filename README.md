@@ -16,7 +16,6 @@ A modern task management application that understands natural language input, bu
 ### Prerequisites
 
 - Python 3.8 or higher
-- PostgreSQL database
 - OpenAI API key
 
 ### 1. Clone the Repository
@@ -41,10 +40,6 @@ OPENAI_API_KEY = "your-openai-api-key"
 ```
 
 Replace the placeholders with your actual database credentials and OpenAI API key.
-
-### 4. Database Setup
-
-The application will automatically create the necessary database table when it first runs. Make sure your PostgreSQL database is running and accessible with the credentials provided in the `DATABASE_URL`.
 
 ### 5. Run the Application
 
