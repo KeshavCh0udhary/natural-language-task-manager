@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import datetime
 from database import init_database, add_task, get_all_tasks, update_task, delete_task
-from task_parser import parse_task
+from task_parser import parse_task, parse_transcript
 
 # Page config
 st.set_page_config(
@@ -62,40 +62,79 @@ if 'db_initialized' not in st.session_state:
 # Title
 st.title("✅ Natural Language Task Manager")
 
-# Input section
-col1, col2 = st.columns([3, 1])
-with col1:
-    task_input = st.text_area(
-        "Enter your tasks (one per line):",
-        placeholder="Call client Rajeev tomorrow 5pm\nFinish landing page Aman by 11pm 20th June\netc.",
-        help="Enter one task per line. Use natural language to describe what needs to be done.",
-        height=100
-    )
-with col2:
-    st.markdown("<br>", unsafe_allow_html=True)
-    add_task_button = st.button("Add Tasks", type="primary", use_container_width=True)
+# Input sections
+st.markdown("### Add Tasks")
 
-# Process new tasks
-if add_task_button and task_input:
-    tasks_to_add = [task.strip() for task in task_input.split('\n') if task.strip()]
-    
-    with st.spinner('Processing tasks...'):
-        for task_text in tasks_to_add:
-            parsed_task = parse_task(task_text)
-            if parsed_task:
-                try:
-                    result = add_task(
-                        parsed_task['task_name'],
-                        parsed_task['assignee'],
-                        parsed_task['due_date'],
-                        parsed_task['priority']
-                    )
-                    if result:
-                        st.success(f"Added task: {parsed_task['task_name']}")
-                except Exception as e:
-                    st.error(f"Error adding task: {str(e)}")
+# Create tabs for different input methods
+tab1, tab2 = st.tabs(["Single Tasks", "Transcript"])
+
+with tab1:
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        task_input = st.text_area(
+            "Enter your tasks (one per line):",
+            placeholder="Call client Rajeev tomorrow 5pm\nFinish landing page Aman by 11pm 20th June\netc.",
+            help="Enter one task per line. Use natural language to describe what needs to be done.",
+            height=100
+        )
+    with col2:
+        st.markdown("<br>", unsafe_allow_html=True)
+        add_task_button = st.button("Add Tasks", type="primary", use_container_width=True)
+
+    # Process new tasks
+    if add_task_button and task_input:
+        tasks_to_add = [task.strip() for task in task_input.split('\n') if task.strip()]
+        
+        with st.spinner('Processing tasks...'):
+            for task_text in tasks_to_add:
+                parsed_task = parse_task(task_text)
+                if parsed_task:
+                    try:
+                        result = add_task(
+                            parsed_task['task_name'],
+                            parsed_task['assignee'],
+                            parsed_task['due_date'],
+                            parsed_task['priority']
+                        )
+                        if result:
+                            st.success(f"Added task: {parsed_task['task_name']}")
+                    except Exception as e:
+                        st.error(f"Error adding task: {str(e)}")
+                else:
+                    st.warning(f"Could not parse task: {task_text}")
+
+with tab2:
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        transcript_input = st.text_area(
+            "Enter your transcript:",
+            placeholder="Aman you take the landing page by 10pm tomorrow. Rajeev you take care of client follow-up by Wednesday...",
+            help="Enter a transcript containing multiple tasks. The system will automatically parse and extract individual tasks.",
+            height=150
+        )
+    with col2:
+        st.markdown("<br>", unsafe_allow_html=True)
+        add_transcript_button = st.button("Process Transcript", type="primary", use_container_width=True)
+
+    # Process transcript
+    if add_transcript_button and transcript_input:
+        with st.spinner('Processing transcript...'):
+            parsed_tasks = parse_transcript(transcript_input)
+            if parsed_tasks:
+                for task in parsed_tasks:
+                    try:
+                        result = add_task(
+                            task['task_name'],
+                            task['assignee'],
+                            task['due_date'],
+                            task['priority']
+                        )
+                        if result:
+                            st.success(f"Added task: {task['task_name']}")
+                    except Exception as e:
+                        st.error(f"Error adding task: {str(e)}")
             else:
-                st.warning(f"Could not parse task: {task_text}")
+                st.warning("Could not parse any tasks from the transcript")
 
 # Display tasks
 st.markdown("### Task Board")

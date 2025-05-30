@@ -10,6 +10,7 @@ A modern task management application that understands natural language input, bu
 - 🗂️ Clean and intuitive task board interface
 - ⚡ Real-time updates and editing
 - 🔄 Persistent storage with Supabase
+- 📋 Transcript parser for handling multiple tasks in a single text
 
 ## Setup Instructions
 
@@ -51,20 +52,40 @@ The application will be available at `http://localhost:8501`
 
 ## Usage
 
-1. Enter tasks in natural language format:
-   - "Call client Rajeev tomorrow 5pm"
-   - "Finish landing page Aman by 11pm 20th June"
-   - "Submit report to Sarah by Friday 3pm P1"
+### Single Task Input
+Enter tasks in natural language format:
+- "Call client Rajeev tomorrow 5pm"
+- "Finish landing page Aman by 11pm 20th June"
+- "Submit report to Sarah by Friday 3pm P1"
 
-2. Tasks will be automatically parsed and organized by priority:
-   - P1: Highest priority (Urgent)
-   - P2: High priority
-   - P3: Medium priority (Default)
-   - P4: Low priority
+### Transcript Input
+Paste a transcript containing multiple tasks:
+```
+Aman you take the landing page by 10pm tomorrow. 
+Rajeev you take care of client follow-up by Wednesday. 
+Shreya please review the marketing deck tonight p1. 
+Keshav call me today at 5pm.
+```
 
-3. Each task can be:
-   - Edited: Change task details, due date, or priority
-   - Deleted: Remove tasks from the board
+### Supported Time Expressions
+The application understands various time expressions:
+- Absolute times: "5pm", "15:00", "3:30 PM"
+- Relative times: "tomorrow", "next week", "today"
+- End of day: "end of day", "eod" (defaults to 5:00 PM)
+- Evening: "tonight" (defaults to 8:00 PM)
+- Specific dates: "20th June", "Friday", "next Monday"
+
+### Priority Levels
+Tasks are automatically organized by priority:
+- P1: Highest priority (Urgent)
+- P2: High priority
+- P3: Medium priority (Default)
+- P4: Low priority
+
+### Task Management
+Each task can be:
+- Edited: Change task details, due date, or priority
+- Deleted: Remove tasks from the board
 
 ## Project Structure
 
