@@ -4,7 +4,7 @@ from datetime import datetime
 
 def get_database_connection():
     """Get a connection to the database using the configured URL."""
-    return psycopg2.connect(st.secrets["DATABASE_URL"])
+    return psycopg2.connect("postgresql://postgres:%40Password9%23@db.wcvfghkffyktywzemkhp.supabase.co:5432/postgres")
 
 def init_database():
     """Initialize the database by creating the tasks table if it doesn't exist."""

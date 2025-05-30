@@ -37,7 +37,6 @@ pip install -r requirements.txt
 Create a `.streamlit/secrets.toml` file in your project directory:
 
 ```toml
-DATABASE_URL = "postgresql://username:password@host:port/database"
 OPENAI_API_KEY = "your-openai-api-key"
 ```
 
